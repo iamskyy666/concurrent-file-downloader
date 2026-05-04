@@ -12,6 +12,7 @@ import (
 
 // 📂 concurrent-file-downloader
 
+// Single File
 func DownLoadFile(url string, destDir string)error{
 	fileName:=filepath.Base(url)
 	fimePath:=filepath.Join(destDir,fileName)
@@ -47,10 +48,38 @@ func DownLoadFile(url string, destDir string)error{
 	return nil
 }
 
+// Multiple Files
+func SequentialDownloader(urls []string,destDir string)error{
+	if err:=os.MkdirAll(destDir,0755);err!=nil{
+		log.Fatal("ERROR:",err)
+	}
+
+	// track the time
+	start:=time.Now()
+
+	for _, url := range urls {
+		if err:=DownLoadFile(url,destDir);err!=nil{
+			log.Println("ERROR doanloading...",url,err)
+			continue
+		}
+	}
+	fmt.Printf("Downloading %s took %s ✅\n",urls,time.Since(start))
+
+	return nil
+}
+
 func main() {
 	url:="https://go.dev/blog/gopher/header.jpg"
 	err:=DownLoadFile(url,"./downloads")
 	if err != nil {
-		log.Println("Done ☑️")
+		log.Println("ERROR:",err)
 	}
+
+	urls:=[]string{"https://go.dev/blog/gopher/wfmu.jpg","https://go.dev/blog/gopher/portrait.jpg"}
+	err=SequentialDownloader(urls,"./downloads")
+	if err != nil {
+		log.Println("ERROR:",err)
+	}
+
+	log.Println("\nDone ☑️")
 }
