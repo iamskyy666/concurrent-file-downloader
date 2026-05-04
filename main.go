@@ -15,8 +15,8 @@ import (
 // Single File
 func DownLoadFile(url string, destDir string)error{
 	fileName:=filepath.Base(url)
-	fimePath:=filepath.Join(destDir,fileName)
-	outPut,err:=os.Create(fimePath) // ex - ./downloads/sample.txt
+	filePath:=filepath.Join(destDir,fileName)
+	outPut,err:=os.Create(filePath) // ex - ./downloads/sample.txt
 	if err != nil {
 		log.Fatal("ERROR:",err)
 	}
@@ -28,12 +28,14 @@ func DownLoadFile(url string, destDir string)error{
 
 	resp,err:=http.Get(url)
 	if err != nil {
+		_= os.Remove(filePath)
 		log.Fatal("ERROR:",err)
 	}
 
 	defer resp.Body.Close()
 
-	if resp.StatusCode!=http.StatusOK{
+	if resp.StatusCode != http.StatusOK{
+		_= os.Remove(filePath)
 		return fmt.Errorf("bad_status: %s",resp.Status)
 	}
 
